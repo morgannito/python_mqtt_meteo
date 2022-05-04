@@ -26,7 +26,6 @@ Json = None
 # Creer une fenetre
 fenetre = Tk()
 
-
 # ----------------------------------------------- Connection au Broker ----------------------------------------------- #
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code " + str(rc))
@@ -46,18 +45,54 @@ def on_message(client, userdata, msg):
     Json = json.loads(message)
     print(Json['uplink_message']['decoded_payload'])
     humi = Json['uplink_message']['decoded_payload']['humidite']
+    print(humi)
     humidite_sol = Json['uplink_message']['decoded_payload']['humidite_sol']
+    print(humidite_sol)
     luminosite = Json['uplink_message']['decoded_payload']['luminosite']
+    print(luminosite)
     pluie = Json['uplink_message']['decoded_payload']['pluie']
+    print(pluie)
     precipitation = Json['uplink_message']['decoded_payload']['precipitation']
+    print(precipitation)
     pression = Json['uplink_message']['decoded_payload']['pression']
+    print(pression)
     temperature = Json['uplink_message']['decoded_payload']['temperature']
-    fenetre.update()
-
-
-
-
-
+    print(temperature)
+    # creation de la nouvelle fenetre
+    for widget in fenetre.winfo_children():
+        widget.destroy()
+    title = Label(fenetre, text="Météo ", font=("caveat", 40), bg="black", fg="white")
+    # Ajoute le titre
+    title.pack()
+    # Creation d'une frame
+    frame = Frame(fenetre, bg="black")
+    # Ajouter la frame
+    frame.pack(expand=YES)
+    # Cration d'un label pour le texte
+    text = Label(frame, text="Temperature : " + str(temperature), font=("caveat", 20), bg="black", fg="white")
+    # Ajouter le label
+    text.pack(side=BOTTOM)
+    # Creation d'un label pour le texte
+    text = Label(frame, text="Humidité Sol :" + str(humidite_sol), font=("caveat", 20), bg="black", fg="white")
+    # Ajouter le label
+    text.pack(side=BOTTOM)
+    # Creation d'un label pour le texte
+    text = Label(frame, text="Pression :" + str(pression), font=("caveat", 20), bg="black", fg="white")
+    # Ajouter le label
+    text.pack(side=BOTTOM)
+    # Creation d'un label pour le texte
+    text = Label(frame, text="Precipitation :" + str(precipitation), font=("caveat", 20), bg="black", fg="white")
+    # Ajouter le label
+    text.pack(side=BOTTOM)
+    # Creation d'un label pour le texte
+    text = Label(frame, text="Pluie :" + str(pluie), font=("caveat", 20), bg="black", fg="white")
+    # Ajouter le label
+    text.pack(side=BOTTOM)
+    # Creation d'un label pour le texte
+    text = Label(frame, text="Cycle Jour / Nuit :" + str(pluie), font=("caveat", 20), bg="black", fg="white")
+    text.pack(side=BOTTOM)
+    text = Label(frame, text="Altitude :" + str(humi), font=("caveat", 20), bg="black", fg="white")
+    text.pack(side=BOTTOM)
 
 
 # Page Home creer la fenetre d'accueil du jeu
@@ -70,8 +105,8 @@ def main():
     # creer un thread pour la reception des messages
     client.loop_start()
 
-    # Fullscreen
-    # fenetre.attributes('-fullscreen', 1)
+    # -------------------------------------------------- Initialisation -------------------------------------------------- #
+
     # Donne un titre à la fenetre
     fenetre.title("Méteo")
     # Dimension de la fenetre
@@ -89,29 +124,29 @@ def main():
     # Ajouter la frame
     frame.pack(expand=YES)
     # Cration d'un label pour le texte
-    text = Label(frame, text="Temperature : " + str(humi), font=("caveat", 20), bg="black", fg="white")
+    text = Label(frame, text="Temperature : " + str(temperature), font=("caveat", 20), bg="black", fg="white")
     # Ajouter le label
     text.pack(side=BOTTOM)
     # Creation d'un label pour le texte
-    text = Label(frame, text="Humidité Sol :", font=("caveat", 20), bg="black", fg="white")
+    text = Label(frame, text="Humidité Sol :" + str(humidite_sol), font=("caveat", 20), bg="black", fg="white")
     # Ajouter le label
     text.pack(side=BOTTOM)
     # Creation d'un label pour le texte
-    text = Label(frame, text="Pression :", font=("caveat", 20), bg="black", fg="white")
+    text = Label(frame, text="Pression :" + str(pression), font=("caveat", 20), bg="black", fg="white")
     # Ajouter le label
     text.pack(side=BOTTOM)
     # Creation d'un label pour le texte
-    text = Label(frame, text="Precipitation :", font=("caveat", 20), bg="black", fg="white")
+    text = Label(frame, text="Precipitation :" + str(precipitation), font=("caveat", 20), bg="black", fg="white")
     # Ajouter le label
     text.pack(side=BOTTOM)
     # Creation d'un label pour le texte
-    text = Label(frame, text="Pluie :", font=("caveat", 20), bg="black", fg="white")
+    text = Label(frame, text="Pluie :" + str(pluie), font=("caveat", 20), bg="black", fg="white")
     # Ajouter le label
     text.pack(side=BOTTOM)
     # Creation d'un label pour le texte
-    text = Label(frame, text="Cycle Jour / Nuit :", font=("caveat", 20), bg="black", fg="white")
+    text = Label(frame, text="Cycle Jour / Nuit :"+str(pluie), font=("caveat", 20), bg="black", fg="white")
     text.pack(side=BOTTOM)
-    text = Label(frame, text="Altitude :", font=("caveat", 20), bg="black", fg="white")
+    text = Label(frame, text="Altitude :"+str(humi), font=("caveat", 20), bg="black", fg="white")
     text.pack(side=BOTTOM)
     fenetre.mainloop()
 
