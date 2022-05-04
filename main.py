@@ -1,29 +1,75 @@
+from datetime import time
 import pygame
 from tkinter import *
 from functools import partial
 
-import paho.mqtt.client as mqtt_client
+import paho.mqtt.client as mqtt
+import json
 
-# se connecter au broker
-client = mqtt_client.Client()
-client.connect("localhost", 1883, 60)
-# utilise un login et un mot de passe
-client.username_pw_set("user", "password")
+humi = "000"
+humidite_sol = ""
+luminosite = ""
+pluie = ""
+precipitation = ""
+pression = ""
+temperature = ""
+
+# Info du Broker
+MQTT_BROKER_HOST = 'eu1.cloud.thethings.network'
+MQTT_BROKER_PORT = 1883
+MQTT_KEEP_ALIVE_INTERVAL = 60
+BROKER_USERNAME = "yolo@ttn"
+BROKER_PASSWORD = "NNSXS.E76A75GYWJRSSK674DPUUMKFWGBEUFIYCFCLOHQ.4ND3D2PSBOO2FHHVQ7APZSKMB3M5RCRSNS2QIUWPK2SWMDQHB7UA"
+
+Json = None
+
+# Creer une fenetre
+fenetre = Tk()
+
+
+# ----------------------------------------------- Connection au Broker ----------------------------------------------- #
+def on_connect(client, userdata, flags, rc):
+    print("Connected with result code " + str(rc))
+    print(userdata)
+    print(flags)
+    # souscrire sur le topic field/camera/CAM1/scan
+    client.subscribe("#", 1)
+
+
+# ---------------------------------------------- Message recu Broker  ------------------------------------------------ #
+def on_message(client, userdata, msg):
+    global Json
+
+    # print("Message Recieved. ", msg.payload.decode())
+    # message recu sur le topic field/camera/CAM1/scan
+    message = msg.payload.decode()
+    Json = json.loads(message)
+    print(Json['uplink_message']['decoded_payload'])
+    humi = Json['uplink_message']['decoded_payload']['humidite']
+    humidite_sol = Json['uplink_message']['decoded_payload']['humidite_sol']
+    luminosite = Json['uplink_message']['decoded_payload']['luminosite']
+    pluie = Json['uplink_message']['decoded_payload']['pluie']
+    precipitation = Json['uplink_message']['decoded_payload']['precipitation']
+    pression = Json['uplink_message']['decoded_payload']['pression']
+    temperature = Json['uplink_message']['decoded_payload']['temperature']
+    fenetre.update()
 
 
 
-def mqttsend():
-    #mqtt_client.mqtt_client()
-    pass
 
-def mqttreceive():
-    pass
+
 
 
 # Page Home creer la fenetre d'accueil du jeu
 def main():
-    # Creer une fenetre
-    fenetre = Tk()
+    client = mqtt.Client()
+    client.connect(MQTT_BROKER_HOST, MQTT_BROKER_PORT, MQTT_KEEP_ALIVE_INTERVAL)
+    client.username_pw_set(BROKER_USERNAME, BROKER_PASSWORD)
+    client.on_connect = on_connect
+    client.on_message = on_message
+    # creer un thread pour la reception des messages
+    client.loop_start()
+
     # Fullscreen
     # fenetre.attributes('-fullscreen', 1)
     # Donne un titre à la fenetre
@@ -40,11 +86,10 @@ def main():
     title.pack()
     # Creation d'une frame
     frame = Frame(fenetre, bg="black")
-
     # Ajouter la frame
     frame.pack(expand=YES)
     # Cration d'un label pour le texte
-    text = Label(frame, text="Temperature :", font=("caveat", 20), bg="black", fg="white")
+    text = Label(frame, text="Temperature : " + str(humi), font=("caveat", 20), bg="black", fg="white")
     # Ajouter le label
     text.pack(side=BOTTOM)
     # Creation d'un label pour le texte
@@ -69,5 +114,6 @@ def main():
     text = Label(frame, text="Altitude :", font=("caveat", 20), bg="black", fg="white")
     text.pack(side=BOTTOM)
     fenetre.mainloop()
+
 
 main()
